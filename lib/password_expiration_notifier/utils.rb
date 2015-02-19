@@ -14,6 +14,10 @@ module PasswordExpirationNotifier
       -((now - password_last_set_t).divmod(24*60*60)[0] - expiration_days)
     end
 
+    def expire_at(password_last_set_t, expiration_days)
+      password_last_set_t + (24 * 60 * 60 * expiration_days)
+    end
+
     def expire_soon?(remaining, expiration_days, expire_within)
       remaining <= 0 || remaining <= expire_within
     end
@@ -36,6 +40,7 @@ module PasswordExpirationNotifier
       selected_users = {}
       ad.users.each do |user, attr|
         attr[:remaining] = remaining(attr[:pwdlastset], conf.expiration_days)
+        attr[:expire_at] = expire_at(attr[:pwdlastset], conf.expiration_days)
         if options[:all] || expire_soon?(attr[:remaining], options[:expire_within], options[:expire_within])
           selected_users[user] = attr
         end
