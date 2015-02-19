@@ -1,0 +1,15 @@
+---
+expire_within: 7
+expiration_days: 20
+ldap:
+  user: "user@example.local"
+  password: "user password"
+  base: "dc=example,dc=local"
+  host: "ldap.example.local"
+  port: 389
+  filterkey: "filter key"
+  filtervalue: "filter value"
+slack:
+  webhook_url: "webhook_url"
+  icon_url: "icon_url"
+  icon_emoji: ":icon_emoji:"

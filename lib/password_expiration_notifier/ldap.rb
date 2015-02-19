@@ -2,19 +2,19 @@ require 'password_expiration_notifier'
 require 'net/ldap'
 
 module PasswordExpirationNotifier
-  class ActiveDirectory
-    def initialize(options = {})
-      opt = options.dup
+  class LDAP
+    def initialize(conf)
+      opt = conf.ldap.to_h
       opt[:auth] = {
-        username: options[:user],
-        password: options[:password],
+        username: conf.ldap.user,
+        password: conf.ldap.password,
         method:   :simple
       }
       @filters = []
       @connection = Net::LDAP.new(opt)
     end
 
-    def add_filter(key = nil, value = nil)
+    def add_filter(key, value)
       @filters << Net::LDAP::Filter.eq(key, value)
     end
 
@@ -31,7 +31,7 @@ module PasswordExpirationNotifier
         end
       end
       users.map do |k,v|
-        v[:pwdlastset] = ActiveDirectory.windows_time_to_ruby_time(v[:pwdlastset])
+        v[:pwdlastset] = LDAP.windows_time_to_ruby_time(v[:pwdlastset])
         [k, v]
       end
     end

@@ -1,5 +1,6 @@
 require 'password_expiration_notifier'
 require 'password_expiration_notifier/ldap'
+require 'password_expiration_notifier/config'
 require 'date'
 
 module PasswordExpirationNotifier
@@ -25,21 +26,25 @@ module PasswordExpirationNotifier
       end
     end
 
-    def fetch_users(options)
-      ad = PasswordExpirationNotifier::ActiveDirectory.new(options)
+    def fetch_users(conf)
+      ad = PasswordExpirationNotifier::LDAP.new(conf)
       ad.add_filter('objectClass', 'user')
-      if options[:filterkey] && options[:filtervalue]
-        ad.add_filter(options[:filterkey], options[:filtervalue])
+      if conf.ldap.filterkey && conf.ldap.filtervalue
+        ad.add_filter(conf.ldap.filterkey, conf.ldap.filtervalue)
       end
 
       selected_users = {}
       ad.users.each do |user, attr|
-        attr[:remaining] = remaining(attr[:pwdlastset], options[:expiration_days])
+        attr[:remaining] = remaining(attr[:pwdlastset], conf.expiration_days)
         if options[:all] || expire_soon?(attr[:remaining], options[:expire_within], options[:expire_within])
           selected_users[user] = attr
         end
       end
       selected_users
+    end
+
+    def config(options)
+      PasswordExpirationNotifier::Config.new(options)
     end
   end
 end
