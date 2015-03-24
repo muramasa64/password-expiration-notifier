@@ -23,6 +23,9 @@ module PasswordExpirationNotifier
       if @connection.bind
         filter = @filters.inject {|f1, f2| f1 & f2}
         @connection.search(filter: filter, return_result: false) do |entry|
+          # UserAccountControl flag 0x0002 => ACCOUNTDISABLE
+          # see https://support.microsoft.com/en-us/kb/305144
+          next unless entry['UserAccountControl'].first.to_i & 0x0002 == 0
           entries = {}
           entry.each do |attr, values|
             entries[attr] = values.size == 1 ? values.first : values
