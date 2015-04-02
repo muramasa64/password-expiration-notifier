@@ -29,6 +29,11 @@ module PasswordExpirationNotifier
       type: :numeric,
       desc: "password expiration days",
       default: 90
+    option :exclude_expired,
+      aliases: [:x],
+      type: :boolean,
+      desc: "exclude password expiration",
+      default: true
     def list()
       users = fetch_users(config(options))
       show_list(users)
@@ -48,6 +53,11 @@ module PasswordExpirationNotifier
     option :dry_run,
       type: :boolean,
       desc: "show list only. do not sent notify"
+    option :exclude_expired,
+      aliases: [:x],
+      type: :boolean,
+      desc: "exclude password expiration",
+      default: true
     def notify()
       conf = config(options)
       users = fetch_users(conf)
