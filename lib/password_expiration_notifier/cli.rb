@@ -58,12 +58,17 @@ module PasswordExpirationNotifier
       type: :boolean,
       desc: "exclude password expiration",
       default: true
+    option :verbose,
+      type: :boolean,
+      desc: "notify to stdout",
+      default: false
     def notify()
       conf = config(options)
       users = fetch_users(conf)
       slack = PasswordExpirationNotifier::Slack.new(conf)
       users.each do |user|
-        slack.notify_to(user)
+        message = slack.notify_to(user)
+        puts message if options[:verbose]
       end
     end
   end
