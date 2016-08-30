@@ -18,7 +18,11 @@ module PasswordExpirationNotifier
       )
       message = "Your domain account #{attr[:samaccountname]}'s password expire at #{attr[:expire_at]}. Please update your password."
       unless @conf.dry_run
-        client.notify(message)
+        begin
+          client.notify(message)
+        rescue SlackNotify::Error => e
+          return "SlackNotify::Error: #{message} #{e}"
+        end
       end
       return message
     end
